@@ -179,7 +179,7 @@ router.get(
       { id: req.user.id, role: req.user.role },
       process.env.JWT_SECRET
     );
-    res.redirect(`http://localhost:3000/auth/callback?token=${token}&role=${req.user.role}`);
+    res.redirect(`https://job-frontend-0azn.onrender.com/auth/callback?token=${token}&role=${req.user.role}`);
   }
 );
 
