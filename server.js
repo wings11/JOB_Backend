@@ -1,6 +1,3 @@
-res.setHeader("Access-Control-Allow-Origin", "https://rangsitjobs.netlify.app");
-res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
 
 require("dotenv").config();
@@ -17,7 +14,14 @@ const applicationsRoutes = require("./routes/applications");
 const app = express();
 
 // Middleware
-app.use(cors({ origin: "https://rangsitjobs.netlify.app", credentials: true }));
+app.use(
+  cors({
+    origin: "https://rangsitjobs.netlify.app",
+    credentials: true,
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
 app.use(express.json());
 
 // Session configuration
