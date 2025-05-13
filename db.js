@@ -10,9 +10,13 @@ const sslConfig = isLocal
   ? false
   : { rejectUnauthorized: false }; // Neon requires SSL, disable cert verification
 
+
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: sslConfig,
+  ssl: {
+    rejectUnauthorized: false, // <- Accept Supabase’s cert
+  },
 });
 
 pool.on("error", (err) => {
