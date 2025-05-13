@@ -1,3 +1,8 @@
+res.setHeader("Access-Control-Allow-Origin", "https://rangsitjobs.netlify.app");
+res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
