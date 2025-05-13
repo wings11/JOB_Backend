@@ -16,6 +16,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("Google OAuth: Profile received", { id: profile.id, emails: profile.emails });
         if (!profile.emails || !profile.emails[0].value) {
           console.error("Google OAuth: No email provided in profile", profile);
           return done(new Error("No email provided by Google"));
@@ -38,7 +39,7 @@ passport.use(
         console.log("Google OAuth: User created", result.rows[0].email);
         return done(null, result.rows[0]);
       } catch (err) {
-        console.error("Google OAuth Error:", err);
+        console.error("Google OAuth Error:", err.message, err.stack);
         return done(err);
       }
     }
@@ -60,7 +61,7 @@ passport.deserializeUser(async (id, done) => {
     console.log("Deserialized user", result.rows[0].email);
     done(null, result.rows[0]);
   } catch (err) {
-    console.error("Deserialize Error:", err);
+    console.error("Deserialize Error:", err.message, err.stack);
     done(err);
   }
 });
@@ -87,7 +88,7 @@ router.post("/register", async (req, res) => {
     console.log("Register: User created", result.rows[0].email);
     res.json({ token, role: result.rows[0].role });
   } catch (err) {
-    console.error("Register Error:", err);
+    console.error("Register Error:", err.message, err.stack);
     if (err.code === "23505") {
       res.status(400).json({ error: "Email already registered" });
     } else {
@@ -117,13 +118,13 @@ router.post("/admin/register", async (req, res) => {
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     console.log("Admin Register: Creating user", { email, role });
     const result = await pool.query(
-      "INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING id, email, role",
+      "INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNIN G id, email, role",
       [email, hashedPassword, role]
     );
     console.log("Admin Register: User created", result.rows[0].email);
     res.json({ message: "Account created successfully" });
   } catch (err) {
-    console.error("Admin Register Error:", err);
+    console.error("Admin Register Error:", err.message, err.stack);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -151,7 +152,7 @@ router.post("/login", async (req, res) => {
     console.log("Login: Success", user.email);
     res.json({ token, role: user.role });
   } catch (err) {
-    console.error("Login Error:", err);
+    console.error("Login Error:", err.message, err.stack);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -160,7 +161,7 @@ router.post("/login", async (req, res) => {
 router.get(
   "/google",
   (req, res, next) => {
-    console.log("Initiating Google OAuth");
+    console.log("Initiating Google OAuth", { query: req.query });
     next();
   },
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -169,7 +170,7 @@ router.get(
 router.get(
   "/google/callback",
   (req, res, next) => {
-    console.log("Google OAuth callback received");
+    console.log("Google OAuth callback received", { query: req.query });
     next();
   },
   passport.authenticate("google", { session: false, failureRedirect: "/login" }),
@@ -177,7 +178,8 @@ router.get(
     console.log("Google OAuth: Generating token for user", req.user.email);
     const token = jwt.sign(
       { id: req.user.id, role: req.user.role },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" } // Add token expiration for security
     );
     res.redirect(`https://rangsitjobs.netlify.app/auth/callback?token=${token}&role=${req.user.role}`);
   }
@@ -201,7 +203,7 @@ router.get("/me", async (req, res) => {
     console.log("Get Me: User retrieved", user.email);
     res.json(user);
   } catch (err) {
-    console.error("Get Me Error:", err);
+    console.error("Get Me Error:", err.message, err.stack);
     res.status(401).json({ error: "Invalid token" });
   }
 });
