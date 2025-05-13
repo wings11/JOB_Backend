@@ -19,12 +19,8 @@ const pool = new Pool({
   },
 });
 
-pool.on("error", (err) => {
-  console.error("Database pool error:", err);
-});
 
-pool.on("connect", () => {
-  console.log("Connected to database:", process.env.DATABASE_URL.replace(/:.*@/, ":****@"));
-});
+
+
 
 module.exports = pool;
