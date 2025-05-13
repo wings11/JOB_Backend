@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -28,8 +26,6 @@ passport.use(
         let user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (user.rows.length > 0) {
           console.log("Google OAuth: User found", user.rows[0].email);
-          console.log("Connecting to DB with URL:", process.env.DATABASE_URL);
-
           return done(null, user.rows[0]);
         }
         // Create new user with NULL password
@@ -183,7 +179,7 @@ router.get(
       { id: req.user.id, role: req.user.role },
       process.env.JWT_SECRET
     );
-    res.redirect(`https://job-frontend-0azn.onrender.com/auth/callback?token=${token}&role=${req.user.role}`);
+    res.redirect(`https://rangsitjobs.netlify.app/auth/callback?token=${token}&role=${req.user.role}`);
   }
 );
 
