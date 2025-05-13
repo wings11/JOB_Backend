@@ -1,0 +1,26 @@
+require("dotenv").config();
+const { Pool } = require("pg");
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not defined");
+}
+
+const isLocal = process.env.DATABASE_URL.includes("localhost");
+const sslConfig = isLocal
+  ? false
+  : { rejectUnauthorized: false }; // Neon requires SSL, disable cert verification
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: sslConfig,
+});
+
+pool.on("error", (err) => {
+  console.error("Database pool error:", err);
+});
+
+pool.on("connect", () => {
+  console.log("Connected to database:", process.env.DATABASE_URL.replace(/:.*@/, ":****@"));
+});
+
+module.exports = pool;
