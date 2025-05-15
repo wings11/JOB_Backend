@@ -77,7 +77,7 @@ router.post("/register", async (req, res) => {
       console.error("Register: Missing email or password", req.body);
       return res.status(400).json({ error: "Email and password are required" });
     }
-    const role = email.endsWith("@rsu.ac.th") ? "student" : "guest";
+    const role = email.endsWith("@rsu.ac.th") || email.endsWith("@lamduan.mfu.ac.th")? "student" : "guest";
     console.log("Register: Creating user", { email, role });
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
