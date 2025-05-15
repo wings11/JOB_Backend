@@ -30,7 +30,7 @@ passport.use(
           return done(null, user.rows[0]);
         }
         // Create new user with NULL password
-        const role = email.endsWith("@rsu.ac.th") ? "student" : "guest";
+        const role = email.endsWith("@rsu.ac.th")  || email.endsWith("@lamduan.mfu.ac.th")  ? "student" : "guest";
         console.log("Google OAuth: Creating new user", { email, role });
         const result = await pool.query(
           "INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING *",
