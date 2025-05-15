@@ -19,7 +19,7 @@ router.post("/:id/apply", async (req, res) => {
     if (user.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (!user.rows[0].email.endsWith("@rsu.ac.th")|| !user.rows[0].email.endsWith("@lamduan.mfu.ac.th")) {
+    if (!(user.rows[0].email.endsWith("@rsu.ac.th") || user.rows[0].email.endsWith("@lamduan.mfu.ac.th"))) {
       return res.status(403).json({ error: "Only students with Student emails can apply" });
     }
     const job = await pool.query("SELECT * FROM jobs WHERE id = $1", [req.params.id]);
